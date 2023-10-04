@@ -1,0 +1,37 @@
+import logging
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+
+# Ваш токен бота
+TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'
+
+# Ініціалізація бота
+updater = Updater(token=TOKEN, use_context=True)
+dispatcher = updater.dispatcher
+
+# Налаштування журналювання
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+# Обробник команди /start
+def start(update: Update, context: CallbackContext):
+    update.message.reply_text('Вітаю! Я бот, який реагує на ключові слова.')
+
+# Обробник повідомлень
+def echo(update: Update, context: CallbackContext):
+    # Список ключових слів, на які реагує бот
+    keywords = ['hello', 'привіт', 'привет']
+
+    text = update.message.text.lower()
+
+    for keyword in keywords:
+        if keyword in text:
+            update.message.reply_text('Відповідь на ключове слово "{}".'.format(keyword))
+            return
+
+# Додаємо обробники команд та повідомлень
+dispatcher.add_handler(CommandHandler('start', start))
+dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
+
+# Запускаємо бота
+updater.start_polling()
+updater.idle()
